@@ -27,7 +27,7 @@ func TestReturnCode(t *testing.T) {
 		wg.Add(1)
 		go func(i int) {
 			defer wg.Done()
-			clients[i].Open(socketHost, socketPort)
+			clients[i].Open(socketHost, socketPort, false)
 			remainingSockets++
 			log.Printf("%d sockets opened...\n", remainingSockets)
 		}(i)

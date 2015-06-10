@@ -15,6 +15,7 @@ type Client struct {
 	Socket *net.Conn
 	Host   string
 	Port   int
+	Https  bool
 }
 
 type Result struct {
@@ -24,7 +25,7 @@ type Result struct {
 	TimeTotal             float64
 }
 
-func (c *Client) Open(host string, port int) {
+func (c *Client) Open(host string, port int, https bool) {
 	socket, err := net.Dial("tcp", fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
 		panic(err)
@@ -33,6 +34,7 @@ func (c *Client) Open(host string, port int) {
 	c.Socket = &socket
 	c.Host = host
 	c.Port = port
+	c.Https = https
 }
 
 func (c *Client) Get(route string) (Result, int) {
@@ -41,7 +43,14 @@ func (c *Client) Get(route string) (Result, int) {
 	}
 
 	// Prepare HTTP request.
-	req, err := http.NewRequest("GET", fmt.Sprintf("http://%s%s", c.Host, route), nil)
+	var url string
+	if c.Https {
+		url = fmt.Sprintf("https://%s%s", c.Host, route)
+	} else {
+		url = fmt.Sprintf("http://%s%s", c.Host, route)
+	}
+
+	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		panic(err)
 	}
